@@ -1,0 +1,77 @@
+<?php
+
+$this->headLink ()->prependStylesheet($this->basePath() . '/css/user.css');
+$p = $this->property[0];
+$u = $this->users;
+?>
+<div ng-app="userApp" ng-controller="userController">
+
+    <div class="clearfix p-15-0 m-10-0">
+        <aside class="col-md-3 br-radius-5 no-padding-left">
+            <?php echo $this->partial("application/user-management/_left_panel"); ?>
+        </aside>
+        <aside class="col-md-9">
+            <div class="m-bottom-15 p-b-10 br-b-gray">
+                <h3 class="title">List all users
+                    <?php if(!empty($this->id)):?>
+                    <span class="label label-success pull-right font-13">A user was <?php echo $this->action; ?>d.</span>
+                    <?php endif;?>
+                </h3>
+            </div>
+
+            <div class="m-bottom-15 p-b-10 clearfix detail">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>User name</th>
+                            <th>Role name</th>
+                            <th>Last login</th>
+                            <th class="text-center">Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php  foreach($u as $k=>$v): ?>
+                        <tr>
+                            <td><?php echo $k+1; ?></td>
+                            <td><?php echo $v["user_name"] ?></td>
+                            <td><?php echo $v["role_name"] ?></td>
+                            <td><?php echo $v["user_last_login"] ?></td>
+                            <td class="text-center">
+                                <a data-id="<?php echo $v["user_id"] ?>" href="<?php echo $this->basepath("/user-edit/" .$v["user_id"]) ?>"> <i class="glyphicon glyphicon-pencil"></i> Edit</a>
+                                &nbsp;&nbsp; | &nbsp;&nbsp;
+                                <a class="act-delete" data-id="<?php echo $v["user_id"] ?>" href="<?php echo $this->basepath("/user-remove/" .$v["user_id"]) ?>"> <i class="glyphicon glyphicon-remove"></i> Remove</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+        </aside>
+    </div>
+</div>
+<script>
+    var baseUrl = '<?php echo $this->basepath(); ?>';
+    $('.act-delete').click(function(){
+        if(confirm("Do you want to delete user?")){
+            var id = $(this).attr('data-id');
+            var _this = this;
+            $.ajax({
+                type: 'DELETE',
+                url: baseUrl + '/user/' + id,
+                success: function() {
+                    $(_this).parents('tr').slideUp().remove();
+                    $('h3.title').html(
+                        'List all users <span class="label label-success pull-right font-13">A user was deleted.</span>'
+                    );
+                }
+            });
+        }
+        return false;
+    });
+</script>
+
+
+

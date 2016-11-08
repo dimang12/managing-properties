@@ -1,0 +1,88 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: dimang12
+ * Date: 10/6/14
+ * Time: 11:34 AM
+ */
+?>
+
+<h4 class="m-15-0 p-15-0">Pricing</h4>
+
+<div class="clearfix">
+
+    <aside class="col-md-4">
+        <div class="form-group">
+            <label for="">Price with tax:
+                <span ng-show="frm.price_tax.$dirty && frm.price_tax.$error.number" class="text-danger">Value isn't number!</span>
+            </label>
+            <input name="price_tax" ng-model="p.price_tax" type="number"  class="form-control" id="" placeholder="price by government's taxt">
+        </div>
+    </aside>
+    <aside class="col-md-8">
+        <div class="form-group clearfix">
+            <div class="col-md-9 no-padding-left price-panel">
+                <label for="">Pricing:
+                    <span ng-show="frm.price_original.$error.number" class="text-danger">Value isn't number!</span>
+                </label>
+                <input name="price_original" ng-model="p.price_original" type="text" class="form-control price-control" id="" placeholder="origional price">
+            </div>
+            <div class="col-md-2 no-padding">
+                <label>
+                    Year:
+                </label>
+                <select name="original_year" class="form-control">
+                    <option ng-repeat="year in p.years" >{{year}}</option>
+                </select>
+            </div>
+            <div class=" pull-right margin-top-10">
+                <label>&nbsp;</label>
+                <a class="btn btn-success margin-top-10 btn-more-price"><i class="glyphicon glyphicon-plus"></i></a>
+            </div>
+        </div>
+
+        <div class="clearfix more-price-panel">
+
+
+        </div>
+    </aside>
+</div>
+<script>
+    $(document).ready(function(){
+        var year = d.getFullYear();
+        var option = '';
+
+        // set years variable for 10 years
+        for(var i=0; i<20; i++){
+            option += '<option value="'+(year-i)+'">'+(year-i)+'</option>'
+        }
+
+
+        $('.btn-more-price').on('click', function () {
+            str = '<div class="form-group clearfix price-panel">' +
+                    '<div class="col-md-9 no-padding-left">' +
+                        '<label for="">Pricing:</label>'+
+                        '<input name="price_original" ng-model="p.price_original" type="text" class="form-control price-control" id="" placeholder="origional price">' +
+                    '</div>' +
+                    '<div class="col-md-2 no-padding">' +
+                        '<label>Year:</label>' +
+                        '<select name="original_year" class="form-control">'+
+                            option +
+                        '</select>' +
+                    '</div>' +
+                    '<div class=" pull-right margin-top-10">' +
+                        '<label>&nbsp;</label>' +
+                        '<a class="btn btn-danger margin-top-10 btn-delete-price"><i class="glyphicon glyphicon-trash"></i></a>' +
+                    '</div>' +
+                '</div>';
+
+            $('.more-price-panel').append($(str));
+        });
+
+        $('.more-price-panel').on('click','.btn-delete-price', function(){
+            $(this).parents('.price-panel').slideUp(function(){
+                $(this).remove();
+            });
+        });
+    });
+</script>

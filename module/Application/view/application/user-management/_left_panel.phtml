@@ -1,0 +1,20 @@
+
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingOne">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    User Management
+                </a>
+            </h4>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <ul class="nav nav-pills" role="tablist">
+                    <li role="presentation" class="<?php if($this->active == ""){ echo "active";} ?> "><a href="<?php echo $this->basepath("/user-management");?>" >List all users</a></li>
+                    <li role="presentation" class="<?php if($this->active == "user-add"){ echo "active";} ?> "><a href="<?php echo $this->basepath("/user-add");?>">Add new user</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

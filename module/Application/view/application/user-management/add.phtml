@@ -1,0 +1,125 @@
+<?php
+
+$this->headLink ()->prependStylesheet($this->basePath() . '/css/user.css');
+
+$u = $this->user;
+
+?>
+<div ng-app="userApp" ng-controller="userController">
+
+    <div class="clearfix p-15-0 m-10-0">
+        <aside class="col-md-3 br-radius-5 no-padding-left">
+            <?php echo $this->partial("application/user-management/_left_panel"); ?>
+        </aside>
+        <aside class="col-md-9">
+            <form action="" method="post">
+                <div class="m-bottom-15 p-b-10 br-b-gray clearfix">
+                    <h3 class="pull-left">Add new user </h3>
+                    <span class="loading pull-right m-10 hidden"></span>
+                </div>
+                <div class="clearfix p-15-0">
+                    <div class="col-md-6">
+                        <label>Role: <i class="text-danger">*</i></label>
+                        <select class="form-control" name="role_id">
+                            <?php foreach($this->roles as $k=>$v): ?>
+                            <option  value="<?php echo $v["role_id"] ?>"><?php echo $v["role_name"];?></option>
+                            <?php endforeach;?>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>User name: <i class="text-danger">*</i></label>
+                        <input class="form-control" name="user_name" required="" type="text" />
+                    </div>
+                </div>
+
+                <div class="clearfix">
+                    <div class="col-md-6">
+                        <label>Password: <i class="text-danger match-pass">*</i></label>
+                        <input class="form-control" name="user_pass" type="password" required="">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Re-password: <i class="text-danger match-pass">*</i></label>
+                        <input class="form-control" name="re_user_pass" required="" type="password" />
+                    </div>
+                </div>
+
+                <div class="clearfix p-15-0">
+                    <br>
+                    <div class="text-center">
+                        <a href="<?php echo $_SERVER["HTTP_REFERER"]; ?>" class="btn btn-default"><i class="glyphicon glyphicon-remove-sign"></i> Cancel </a>
+                        <button class="btn btn-info  btn-save"><i class="glyphicon glyphicon-floppy-disk"></i> Save new user</button>
+                    </div>
+
+                </div>
+            </form>
+        </aside>
+    </div>
+</div>
+<script>
+    $(function(){
+        var baseUrl = '<?php echo $this->basepath()?>';
+        $('.btn-save').on('click', function(){
+            if(validUser()==true){
+                var data = {
+                    role_id: $('select[name="role_id"]').val(),
+                    user_name: $('input[name="user_name"]').val(),
+                    user_pass: $('input[name="user_pass"]').val()
+                };
+                $('.loading').removeClass('hidden');
+                $.ajax({
+                    data: $.param(data),
+                    type: 'POST',
+                    url: baseUrl + '/user',
+                    dataType: "json",
+                    success: function(data){
+                        window.location.href = baseUrl + "/user-management/" + data.id ;
+                    }
+                });
+            }
+            return false;
+        });
+
+        $('input').on('blur', function(){
+            if($(this).val()!=''){
+                $(this).removeClass('required');
+            }
+        });
+
+        var validUser = function(){
+            var isValid= true;
+            isValid = isRequire($('input[name="user_name"]'));
+            isValid = isRequire($('input[name="user_pass"]'));
+            isValid = isRequire($('input[name="re_user_pass"]'));
+            isValid = isMatch();
+            return isValid;
+        }
+
+        var isRequire = function(ele){
+            if(ele.val()==''){
+                ele.addClass('required');
+                return false;
+            }else{
+                ele.removeClass('required');
+                return true;
+            }
+        }
+
+        var isMatch =function(){
+            pass = $('input[name="user_pass"]').val();
+            rPass = $('input[name="re_user_pass"]').val();
+            ms = 'Password not match.'
+            if(pass != rPass){
+                $('.match-pass').addClass('match-pass-ms');
+                return false;
+            }else{
+                $('.match-pass').removeClass('match-pass-ms');
+                return true;
+            }
+        }
+    });
+</script>
+
+
+

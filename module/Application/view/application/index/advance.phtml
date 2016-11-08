@@ -1,0 +1,34 @@
+<?php
+$this->headLink ()->prependStylesheet($this->basePath() . '/css/login.css');
+?>
+<div class="clearfix" style="margin-bottom:20px;">
+    <h2 class="font-24 br-b-yeello p-15-0 col-md-6 col-md-offset-3 text-center">
+        Advance Search
+    </h2>
+</div>
+
+<form action="<?php echo $this->basepath("/all-property");  ?>" method="get">
+    <div class="login br-radius-5 p-10-15 text-center clearfix">
+
+        <div class="body p-5">
+            <form role="form" class="clearfix">
+                <div class="form-group">
+                    <label for="exampleInputEmail1" class="full-w text-left">Search:</label>
+                    <input name="s" type="text" class="form-control"  placeholder="Type search text here...">
+                </div>
+                <div class="form-group">
+                    <label for="Province" class="full-w text-left">Province:</label>
+                    <select class="form-control" name="prov">
+                        <option value="">All Provinces</option>
+                        <?php foreach($this->provinces as $k=>$v):?>
+                            <option value="<?php echo $v["province_id"] ?>"><?php echo $v["prov_name"]; ?></option>
+                        <?php endforeach;?>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-info col-md-6 col-md-offset-3 font-16">
+                    <i class="glyphicon glyphicon-search"></i>
+                    Search Now</button>
+            </form>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,16 @@
+.image-preview .i-wrap          { background:rgba(0,0,0,0.9); color:#fff; position:fixed; top:0; left:0; height:600px;  width:100%; z-index:10; }
+.i-wrap .img                    { position:absolute; top:0; left:0; transition: opacity 2s;}
+.i-wrap .opacity-40             { opacity:0.4;}
+.i-wrap .img img                { }
+.i-wrap .i-title                { background:#000; float:right;}
+.i-wrap .i-close                { background:#BE1E2D; cursor:pointer; float:right; margin-top:5px; padding:5px; z-index:12;}
+.i-wrap .i-next, .i-wrap .i-prev{ background:rgba(0,0,0,0.9); cursor:pointer; top:50%; padding:10px 10px; position:absolute;}
+.i-wrap .i-next                 { right:0;}
+.i-wrap .i-prev                 { left:0;}
+.i-wrap .i-thumb-wrap           { background:rgba(47,47,47,0.8); border:#000 solid 2px; text-align:center; border-bottom:0; position:absolute;
+                                  border-top-left-radius:5px; border-top-right-radius:5px;
+                                  bottom:0px; width:90%; margin:0 5%;
+                                }
+.i-wrap .loading                { background-color:rgba(255,255,255,0.9); border-radius:8px; position:absolute;}
+.i-wrap .i-thumb-wrap .i-cursor { }
+.i-wrap .i-thumb-wrap a         { display:inline-block; width:80px; height:50px; margin:8px; background-size: cover; background-position: center;}

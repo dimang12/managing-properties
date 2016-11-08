@@ -1,0 +1,101 @@
+<?php
+    $this->headScript()->prependFile($this->basepath(). "/js/jspdf.min.js");
+    $this->headScript()->prependFile($this->basepath(). "/js/jquery.excel.js");
+?>
+<div class="">
+    <div class="clearfix">
+        <div class="col-md-2">
+            <br>
+            <div class="list-group">
+                <a href="<?php echo $this->basepath();?>/report" class="list-group-item <?php if($this->option==0) echo "active"; ?>">Active properties</a>
+                <a href="<?php echo $this->basepath();?>/report/index/remove" class="list-group-item <?php if($this->option==1) echo "active"; ?>">Remove properties</a>
+            </div>
+        </div>
+        <div class="col-md-10">
+            <div class="p-10-0 br-b-gray m-bottom-15"><h4><?php if($this->option==0) echo "Actived"; else echo "Removed" ?> Properties
+                <div class="pull-right font-13 margin-top-10">
+                    <a class="export-pdf" href="#">Export to PDF</a>
+                    <span>&nbsp; | &nbsp;</span>
+                    <a class="export-excel" href="#">Export to Excel</a>
+                </div>
+                </h4></div>
+            <table class="table table-bordered" id="table-report">
+                <thead>
+                <tr>
+                    <th class="text-center">#</th>
+                    <th>Code</th>
+                    <th>Title</th>
+                    <th>Pro/City</th>
+                    <th>Location</th>
+                    <th>Size</th>
+                    <th>Last year price</th>
+                    <th>Market price</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach($this->paginator as $k=>$v): ?>
+                    <tr>
+                        <td class="text-center"><?php echo (20*($this->page-1)) + ($k+1); ?></td>
+                        <td><?php echo $v["prop_code"]; ?></td>
+                        <td><?php echo $v["prop_name"]; ?></td>
+                        <td><?php echo $v["prov_name"]; ?></td>
+                        <td><?php echo $v["prop_location"]; ?></td>
+                        <td><?php echo $v["prop_size"]; ?></td>
+                        <td>$ <?php echo $v["price_latest"]; ?></td>
+                        <td>$ <?php echo $v["price_market"]; ?></td>
+
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+            <div class="text-center clearfix display-block"> <?php echo $this->paginationControl($this->paginator,'sliding',array('layout/_paginator.phtml','viewmore'),array('controller' => 'Index','category'=>$this->category));?> </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $('.export-pdf').on('click', function(){
+        var table = $('#table-report tbody tr');
+        var doc = new jsPDF('landscape', 'pt', 'a4', true);
+        doc.text(350,30,"Anco Brother Co., Ltd.");
+        doc.text(348,55,"A List of All Properties.");
+        doc.setFontSize(12);
+        doc.setFontStyle('bold');
+        doc.cellInitialize();
+        doc.cell(15, 70, 30, 20,'#', 0);
+        doc.cell(15, 10, 70, 20, 'Code No.', 0);
+        doc.cell(15, 10, 250, 20, 'Title', 0);
+        doc.cell(15, 10, 120, 20, 'Province/City', 0);
+        doc.cell(15, 10, 100, 20, 'Location', 0);
+        doc.cell(15, 10, 80, 20, 'Size', 0);
+        doc.cell(15, 10, 70, 20, 'LY-Price', 0);
+        doc.cell(15, 10, 70, 20, 'C-Price', 0);
+        doc.setFontStyle('normal');
+        $(table).each(function(k,v){
+            var row  = $(v).find('td');
+            doc.cell(15, 10, 30, 20, $(row[0]).text(), k+1);
+            var code = ($(row[1]).text()=='')?'-':$(row[1]).text();
+            doc.cell(15, 10, 70, 20, code, k+1);
+            doc.cell(15, 10, 250, 20, $(row[2]).text(), k+1);
+            doc.cell(15, 10, 120, 20, $(row[3]).text(), k+1);
+            doc.cell(15, 10, 100, 20, $(row[4]).text(), k+1);
+            doc.cell(15, 10, 80, 20, $(row[5]).text(), k+1);
+            doc.cell(15, 10, 70, 20, $(row[6]).text(), k+1);
+            doc.cell(15, 10, 70, 20, $(row[7]).text(), k+1);
+        });
+        // Save the PDF
+        doc.save("report.pdf");
+        return false;
+    });
+
+    $('.export-excel').on('click', function(){
+        $("#table-report").table2excel({
+            exclude: ".noExl",
+            name: "Property report"
+        });
+        return false;
+    });
+
+</script>
+

@@ -1,0 +1,204 @@
+<?php
+$this->headScript ()
+    ->prependFile ( 'https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=drawing,geometry')
+    ->prependFile ( $this->basepath(). '/js/angularjs.js')
+    ->prependFile ( $this->basepath(). '/js/bootstrap3-wysihtml5.js')
+    ->prependFile ( $this->basepath(). '/js/wysihtml5-0.3.0.min.js')
+;
+$this->headLink ()->prependStylesheet($this->basePath() . '/css/bootstrap-wysihtml5.css');
+?>
+<div ng-app="addNewApp" ng-controller="addNewController">
+    <div class="clearfix p-15-0 m-10-0">
+        <form action="" method="post" enctype="multipart/form-data" name="frm" ng-submit="submitForm()">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs add-tab" role="tablist">
+                <li class="active"><a href="#home" role="tab" data-toggle="tab">Step 1</a></li>
+                <li><a href="#profile" role="tab" data-toggle="tab" ng-click="tap2Clicked()">Step 2</a></li>
+                <li><a href="#image" role="tab" data-toggle="tab" >Step 3</a></li>
+
+                <li class="pull-right" style="margin-top:-8px;">
+                    <span class="loading m-5 hidden"></span>
+                    <button ng-click="back('<?php  echo $_SERVER['HTTP_REFERER']; ?>')" href="#" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-chevron-left"></i> Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-info btn-save"><i class="glyphicon glyphicon-floppy-disk"></i> Save </button>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="home">
+                    <div>
+                        <?php echo $this->partial("application/form/_general_info"); ?>
+                        <?php echo $this->partial("application/form/_pricing"); ?>
+                        <?php echo $this->partial("application/form/_neighbor"); ?>
+                        <?php echo $this->partial("application/form/_swot"); ?>
+                        <?php echo $this->partial("application/form/_vision"); ?>
+                    </div>
+                </div>
+                <div class="tab-pane" id="profile">
+                    <?php echo $this->partial("application/form/_map"); ?>
+                </div>
+                <div class="tab-pane" id="image">
+                    <br><br>
+
+                </div>
+            </div>
+        </form>
+        <?php echo $this->partial("application/form/_image"); ?>
+    </div>
+</div>
+
+
+
+<script>
+    var pathArrayTemp = [];
+    var areaTemp = null;
+    var map = null;
+    var polygons = null;
+    var center  = null;
+    var baseUrl = '<?php echo $this->basepath();?>';
+    var addNewApp = angular.module("addNewApp", []);
+    var images = [];
+    var d = new Date();
+    var year = d.getFullYear();
+    var years = [];
+
+    // set years variable for 10 years
+    for(var i=0; i<20; i++){
+        years.push(year-i);
+    }
+
+
+
+    function addNewController($scope, $http){
+        $scope.p = {};
+        $scope.provinces = <?php echo $this->province; ?>;
+        $scope.p.years = years;
+
+        $scope.submitForm = function(){
+            $scope.p.prop_polygon = pathArrayTemp;
+            $scope.p.images = images;
+            $scope.p.polygon_size = $('.polygon-area-number').text();
+
+
+            $scope.p.swot_strength = $('textarea[name="swot_strength"]').val();
+            $scope.p.swot_weakness = $('textarea[name="swot_weakness"]').val();
+            $scope.p.swot_opportunity = $('textarea[name="swot_opportunity"]').val();
+            $scope.p.swot_threat = $('textarea[name="swot_threat"]').val();
+            $scope.p.prop_description = $('textarea[name="prop_description"]').val();
+            $scope.p.prop_vision = $('textarea[name="prop_vision"]').val();
+
+            $scope.p.pricing =  $scope.getPrice();
+
+            $('.loading').removeClass('hidden');
+            $http({
+                method  : 'POST',
+                url     : baseUrl + '/property',
+                data    : $.param($scope.p),  // pass in data as strings
+                headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+            }).success(function(data){
+               window.location.href = baseUrl + '/all-property?pid=' + data.id;
+            });
+        }
+
+        $scope.back = function(url){
+            window.location.href = url;
+        }
+
+        $scope.provinceChange = function(){
+            $($scope.provinces).each(function(k,v){
+                if(v.province_id == $scope.p.province_id){
+                    center = new google.maps.LatLng(v.prov_lat, v.prov_lng);
+                }
+            });
+        }
+
+        $scope.getPrice = function(){
+            var values = [];
+            $('.price-control').each(function(){
+                var y = $(this).parents('.form-group').find('select').val();
+                var v = $(this).val();
+                var value = {"price":v, 'year':y};
+                values.push(value);
+            });
+            return values;
+        }
+    }
+
+
+
+    function initialize() {
+        center = new google.maps.LatLng(11.549608, 104.912727);
+        var mapOptions = {
+            center: center,
+            zoom: 15
+        };
+
+        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+        var drawingManager = new google.maps.drawing.DrawingManager({
+            drawingMode: google.maps.drawing.OverlayType.POLYGON,
+            drawingControl: true,
+            drawingControlOptions: {
+                position: google.maps.ControlPosition.TOP_CENTER,
+                drawingModes: [
+                    google.maps.drawing.OverlayType.POLYGON,
+                ]
+            },
+
+            polygonOptions: {
+                fillColor: '#ffff00',
+                fillOpacity: 1,
+                strokeWeight: 2,
+                clickable: true,
+                editable: true,
+                draggable: true,
+                geodesic: true,
+                zIndex: 1
+            }
+        })
+
+
+        google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
+            var paths = polygon.getPath();
+//            var fencePoints = [];
+            var temp = [];
+            for (var i = 0; i < paths.length; i++) {
+                var xy = paths.getAt(i);
+                temp.push({ lat: xy.lat(), lon: xy.lng() });
+            }
+//            console.log(temp);
+            pathArrayTemp.push(temp);
+//console.log(pathArrayTemp);
+
+            //if(polygons!=null) { polygons.setMap(null);}
+            polygons = polygon;
+//            polygon.setMap(null);
+//            polygons.setMap(map);
+
+            $('.polygon-area').html('<b> Area: </b> <span class="polygon-area-number">' + google.maps.geometry.spherical.computeArea(polygon.getPath()).toFixed(3) + '</span> smq2');
+        });
+        drawingManager.setMap(map);
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+
+    $('.add-tab a').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show');
+        google.maps.event.trigger(map, 'resize');
+        map.setCenter(center);
+        href= $(this).attr('href');
+        if(href=='#image'){
+            $('.img-panel').removeClass('hidden')
+        }else{
+            $('.img-panel').addClass('hidden');
+        }
+    });
+
+    $(document).ready(function(){
+        $('textarea').wysihtml5({image:false, link:false});
+        $('.btn-clear-map').on('click', function(){
+           polygons.setMap(null);
+        });
+    });
+</script>

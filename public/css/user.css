@@ -1,0 +1,6 @@
+.nav-pills li               { display:block; padding:3px 0; width:100%; margin:0 !important;}
+.nav-pills li a:hover       {  background-color: #428BCA; color: #FFFFFF;}
+.required                   { border:#ff0000 solid 1px;}
+.match-pass-ms:after        { content: "Password not match.";}
+.u-saving:after             { content: "saving..."}
+.u-saved:after              { content: "A new user have been saved."}

@@ -1,0 +1,126 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: dimang12
+ * Date: 10/6/14
+ * Time: 11:34 AM
+ */
+?>
+<?php
+/**
+ * Created by PhpStorm.
+ * User: dimang12
+ * Date: 10/6/14
+ * Time: 11:34 AM
+ */
+?>
+
+<h4 class="m-15-0 p-15-0">Pricing</h4>
+
+<div class="clearfix">
+
+    <aside class="col-md-4">
+        <div class="form-group">
+            <label for="">Price with tax:
+                <span ng-show="frm.price_tax.$dirty && frm.price_tax.$error.number" class="text-danger">Value isn't number!</span>
+            </label>
+            <input name="price_tax" ng-model="p.price_tax" type="number"  class="form-control" id="" placeholder="price by government's taxt">
+        </div>
+    </aside>
+
+
+    <aside class="col-md-8 all-price-panel">
+        <div class="form-group clearfix">
+            <?php foreach($this->prices as $k=>$v): ?>
+
+            <div class="price-panel">
+                <div class="col-md-9 no-padding-left">
+                    <label for="">Pricing in <?php echo $v["year"] ?>:
+                        <span ng-show="frm.price_original.$error.number" class="text-danger">Value isn't number!</span>
+                    </label>
+                    <input data-id="<?php echo $v["price_id"]; ?>" name="price_original" value="<?php echo $v["price"]; ?>"  type="text" class="form-control price-control" id="" placeholder="origional price">
+                </div>
+                <div class="col-md-2 no-padding">
+                    <label>
+                        Year:
+                    </label>
+                    <select name="original_year" class="form-control">
+                        <option ng-selected="{{year == <?php echo $v["year"];?>}}" ng-repeat="year in p.years">{{year}}</option>
+                    </select>
+                </div>
+                <?php if($k==0): ?>
+                    <div class=" pull-right margin-top-10">
+                        <label>&nbsp;</label>
+                        <a class="btn btn-success margin-top-10 btn-more-price"><i class="glyphicon glyphicon-plus"></i></a>
+                    </div>
+                <?php else:?>
+                    <div class=" pull-right margin-top-10">
+                        <a data-id="<?php echo $v["price_id"]; ?>" class="btn btn-danger margin-top-10 btn-delete-price"><i class="glyphicon glyphicon-trash"></i></a>
+                    </div>
+                <?php endif;?>
+            </div>
+            <?php endforeach; ?>
+
+
+        </div>
+        <div class="clearfix more-price-panel">
+
+
+        </div>
+    </aside>
+</div>
+
+<script>
+    $(document).ready(function(){
+        var baseUrl = '<?php echo $this->basepath(); ?>';
+        var year = d.getFullYear();
+        var option = '';
+
+        // set years variable for 10 years
+        for(var i=0; i<20; i++){
+            option += '<option value="'+(year-i)+'">'+(year-i)+'</option>'
+        }
+
+
+        $('.btn-more-price').on('click', function () {
+            str = '<div class="form-group clearfix price-panel">' +
+            '<div class="col-md-9 no-padding-left">' +
+            '<label for="">Pricing:</label>'+
+            '<input name="price_original" ng-model="p.price_original" type="text" class="form-control price-control" id="" placeholder="origional price">' +
+            '</div>' +
+            '<div class="col-md-2 no-padding">' +
+            '<label>Year:</label>' +
+            '<select name="original_year" class="form-control">'+
+            option +
+            '</select>' +
+            '</div>' +
+            '<div class=" pull-right margin-top-10">' +
+            '<label>&nbsp;</label>' +
+            '<a data-id="" class="btn btn-danger margin-top-10 btn-delete-price"><i class="glyphicon glyphicon-trash"></i></a>' +
+            '</div>' +
+            '</div>';
+
+            $('.more-price-panel').append($(str));
+        });
+
+        $('.all-price-panel').on('click','.btn-delete-price', function(){
+            var id = $(this).attr('data-id');
+            var url  = baseUrl + '/index/removeprice/' + id;
+
+            var _this = this;
+            if(id!=''){
+                if(confirm('Are you sure want to delete price?')){
+                    $.ajax({url:url, success:function(){
+                        $(_this).parents('.price-panel').slideUp(function(){
+                            $(_this).remove();
+                        });
+                    }});
+                }
+            }else{
+                $(this).parents('.price-panel').slideUp(function(){
+                    $(this).remove();
+                });
+            }
+        });
+    });
+</script>

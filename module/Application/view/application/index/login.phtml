@@ -1,0 +1,27 @@
+<?php
+    $this->headLink ()->prependStylesheet($this->basePath() . '/css/login.css');
+?>
+<div class="clearfix" style="margin-bottom:20px;">
+    <h2 class="font-24 br-b-yeello p-15-0 col-md-6 col-md-offset-3 text-center">
+        Welcome to RealEstate Management
+    </h2>
+</div>
+
+<form action="" method="post">
+    <div class="login br-radius-5 p-10-15 text-center clearfix">
+        <img src="<?php echo $this->basepath(); ?>/img/user-login.png">
+        <div class="body p-5">
+            <form role="form" class="clearfix">
+                <div class="form-group">
+                    <label for="exampleInputEmail1" class="full-w text-left">User name:</label>
+                    <input name="txtUserName" type="text" class="form-control" id="exampleInputEmail1" placeholder="user name">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1" class="full-w text-left">Password:</label>
+                    <input name="txtPassword" type="password" class="form-control" id="exampleInputPassword1" placeholder="password">
+                </div>
+                <button type="submit" class="btn btn-info col-md-6 col-md-offset-3 font-16">Login</button>
+            </form>
+        </div>
+    </div>
+</form>
